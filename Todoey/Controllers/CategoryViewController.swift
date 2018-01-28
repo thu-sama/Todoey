@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 import RealmSwift
+import ChameleonFramework
 
 class CategoryViewController: SwipeTableViewController {
     
@@ -20,8 +21,6 @@ class CategoryViewController: SwipeTableViewController {
         super.viewDidLoad()
         
         loadCategories()
-        
-        tableView.rowHeight = 80.0
     }
     
     //MARK: - Tableview Datasource Methods
@@ -33,7 +32,14 @@ class CategoryViewController: SwipeTableViewController {
         
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
-        cell.textLabel?.text = categoryArray?[indexPath.row].name ?? "No Categories Added Yet"
+        if let category = categoryArray?[indexPath.row] {
+            cell.textLabel?.text = category.name
+            
+            guard let categoryColor = UIColor(hexString: category.color) else {fatalError()}
+            
+            cell.backgroundColor = categoryColor
+            cell.textLabel?.textColor = ContrastColorOf(categoryColor, returnFlat: true)
+        }
         
         return cell
     }
@@ -82,6 +88,7 @@ class CategoryViewController: SwipeTableViewController {
             //what will happen when the user click add button
             let newCategory = Category()
             newCategory.name = textField.text!
+            newCategory.color = UIColor.randomFlat.hexValue()
             
             self.saveCategories(category: newCategory)
         }
@@ -108,38 +115,3 @@ class CategoryViewController: SwipeTableViewController {
         }
     }
 }
-
-////MARK: - Swipe Cell Delegate Method
-//extension CategoryViewController: SwipeTableViewCellDelegate{
-//
-//    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
-//        guard orientation == .right else { return nil }
-//
-//        let deleteAction = SwipeAction(style: .destructive, title: "Delete") { action, indexPath in
-//            // handle action by updating model with deletion
-//            if let category = self.categoryArray?[indexPath.row] {
-//                do{
-//                    try self.realm.write {
-//                        self.realm.delete(category)
-//                    }
-//                }
-//                catch{
-//                    print("Error deleting category.\(error)")
-//                }
-//            }
-//        }
-//
-//        // customize the action appearance
-//        deleteAction.image = UIImage(named: "delete-icon")
-//
-//        return [deleteAction]
-//    }
-//
-//    func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeTableOptions {
-//        var options = SwipeTableOptions()
-//        options.expansionStyle = .destructive
-//        return options
-//    }
-//
-//}
-
