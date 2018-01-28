@@ -9,10 +9,12 @@
 import UIKit
 import SwipeCellKit
 import ChameleonFramework
+import EFColorPicker
 
 class SwipeTableViewController: UITableViewController, SwipeTableViewCellDelegate {
     
     var tableDataSourceEmpty = false
+    var efSelectedColor : UIColor = FlatWhite()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,7 +64,6 @@ class SwipeTableViewController: UITableViewController, SwipeTableViewCellDelegat
             
             self.tableView.endUpdates()
         }
-        
         // customize the action appearance
         deleteAction.image = UIImage(named: "delete-icon")
         
@@ -79,4 +80,35 @@ class SwipeTableViewController: UITableViewController, SwipeTableViewCellDelegat
         //update our data model
     }
 
+}
+
+//MARK: - Color Picker
+extension SwipeTableViewController: EFColorSelectionViewControllerDelegate{
+    
+    func colorViewController(colorViewCntroller: EFColorSelectionViewController, didChangeColor color: UIColor) {
+        efSelectedColor = color
+//        print("New color: " + color.debugDescription)
+    }
+    
+    @objc func ef_dismissViewController(sender: UIBarButtonItem) {
+        self.dismiss(animated: true) {
+            [weak self] in
+            if let _ = self {
+                self?.colorPickerCompleted(isChosen: true)
+            }
+        }
+    }
+    
+    @objc func ef_cancelViewController(sender: UIBarButtonItem) {
+        self.dismiss(animated: true) {
+            [weak self] in
+            if let _ = self {
+                self?.colorPickerCompleted(isChosen: false)
+            }
+        }
+    }
+    
+    @objc func colorPickerCompleted(isChosen: Bool){
+        //Color picker closed, do something
+    }
 }
